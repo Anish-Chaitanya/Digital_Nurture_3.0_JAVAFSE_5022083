@@ -1,1 +1,24 @@
+Logger Class:
 
+Private Static Instance: Ensures only one instance of Logger is created.
+Private Constructor: Prevents creation of instances outside the class.
+Synchronized Method: Ensures thread safety when multiple threads access the getInstance method.
+Log Method: A sample method to demonstrate logging functionality.
+Main Class:
+
+Retrieves two references to the Logger instance.
+Logs messages using both references.
+Prints whether the two references are the same instance, verifying the Singleton pattern.
+Running the Code
+Create the Project:
+
+In your IDE, create a new Java project named SingletonPatternExample.
+Add two classes: Logger and Main.
+Add the Code:
+
+Copy the provided Logger.java code into the Logger class file.
+Copy the provided Main.java code into the Main class file.
+Run the Main Class:
+
+Execute Main class to see the output and verify the Singleton behavior.
+The expected output should confirm that both logger1 and logger2 point to the same instance of the Logger class, and the log messages should be printed to the console.
