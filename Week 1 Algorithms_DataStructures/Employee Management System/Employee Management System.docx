@@ -1,0 +1,43 @@
+Array Representation in Memory:
+
+Arrays are a fundamental data structure used to store a fixed-size sequence of elements of the same type. In memory:
+
+Contiguous Block: Arrays are stored in a contiguous block of memory, which means all elements are placed next to each other. This allows for efficient indexing.
+Indexing: Accessing an element in an array is done using an index, which directly maps to a position in memory. This makes element access O(1) in time complexity.
+Fixed Size: The size of an array is fixed upon initialization. Changing the size involves creating a new array and copying elements, which can be costly.
+Advantages of Arrays:
+
+Fast Access: O(1) time complexity for accessing elements by index due to direct memory address calculation.
+Memory Efficiency: Arrays use less memory overhead compared to other data structures like linked lists.
+Simplicity: Arrays are straightforward to implement and use.
+  Time Complexity:
+
+Add Employee:
+
+Best Case: O(1) (if there is space in the array)
+Average Case: O(1) (with amortized cost considering array resizing)
+Worst Case: O(n) (when resizing the array is required)
+Search Employee by ID:
+
+Best Case: O(1) (if the employee is the first in the array)
+Average Case: O(n) (linear search through the array)
+Worst Case: O(n) (if the employee is the last or not present)
+Traverse Employees:
+
+Best Case: O(1) (if there are no employees)
+Average Case: O(n) (linear traversal through the array)
+Worst Case: O(n) (if there are many employees)
+Delete Employee by ID:
+
+Best Case: O(1) (if the employee is the last in the array)
+Average Case: O(n) (linear search and shifting elements)
+Worst Case: O(n) (if the employee is the first or middle, and shifting is required)
+Limitations of Arrays:
+
+Fixed Size: Once initialized, the size cannot be changed easily. Requires resizing and copying when more elements are needed.
+Insertion and Deletion: Inefficient compared to other data structures like linked lists. Insertion and deletion require shifting elements.
+Memory Usage: Arrays might allocate more memory than necessary if the number of elements is much smaller than the allocated size.
+When to Use Arrays:
+
+Use Cases: When you have a fixed number of elements or when the number of elements changes infrequently.
+Advantages: Arrays are efficient for accessing elements by index and have low overhead. They are ideal when the number of elements is known and fixed or changes rarely. For dynamic collections or frequent insertions and deletions, other data structures such as lists or dynamic arrays (e.g., ArrayList) might be more appropriate.
