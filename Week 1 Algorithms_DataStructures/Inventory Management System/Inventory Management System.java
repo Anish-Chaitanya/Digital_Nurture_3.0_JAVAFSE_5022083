@@ -72,6 +72,8 @@ class InventoryManager {
     }
 }
 
+
+//InventoryManagementSystem.java
 public class InventoryManagementSystem {
     public static void main(String[] args) {
         InventoryManager manager = new InventoryManager();
