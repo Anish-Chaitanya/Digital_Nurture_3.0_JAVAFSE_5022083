@@ -1,30 +1,103 @@
+Linear Search
+Definition:
+Linear search is a simple search algorithm that checks every element in a list or array until it finds the target value or reaches the end of the list.
+
+How it works:
+
+Start from the beginning of the list.
+Compare each element with the target value.
+If a match is found, return the position of the element.
+If the end of the list is reached without finding a match, return an indication that the target is not present.
+Time Complexity:
+
+Best-case: 
+𝑂
+(
+1
+)
+O(1) (if the target is at the beginning of the list)
+Average-case: 
+𝑂
+(
+𝑛
+)
+O(n) (where 
+𝑛
+n is the number of elements in the list)
+Worst-case: 
+𝑂
+(
+𝑛
+)
+O(n) (if the target is at the end or not present)
+Binary Search
+Definition:
+Binary search is a more efficient algorithm that requires the list to be sorted. It repeatedly divides the search interval in half to locate the target value.
+
+How it works:
+
+Start with the middle element of the list.
+If the middle element is equal to the target value, return its position.
+If the target value is less than the middle element, repeat the search on the left sublist.
+If the target value is greater than the middle element, repeat the search on the right sublist.
+Continue until the target value is found or the sublist size reduces to zero.
+Time Complexity:
+
+Best-case: 
+𝑂
+(
+1
+)
+O(1) (if the target is the middle element)
+Average-case: 
+𝑂
+(
+log
+⁡
+𝑛
+)
+O(logn) (where 
+𝑛
+n is the number of elements in the list)
+Worst-case: 
+𝑂
+(
+log
+⁡
+𝑛
+)
+O(logn) (if the target is not present or in the last comparison)
+Comparison of Time Complexity:
+
 Linear Search:
 
-Description: Linear search, also known as sequential search, checks each element in a list sequentially until the desired element is found or the end of the list is reached.
-Time Complexity: O(n), where n is the number of elements in the list. This means in the worst-case scenario, the algorithm will look at each element once.
-When to Use: Linear search is ideal for small or unsorted datasets, or when you don't need to perform searches frequently.
+Time Complexity: 
+𝑂
+(
+𝑛
+)
+O(n)
+Requires no pre-sorting.
+Simple and straightforward but can be slow for large lists.
 Binary Search:
 
-Description: Binary search is a more efficient algorithm that works on sorted lists. It repeatedly divides the search interval in half. If the target value is less than the item in the middle of the interval, it narrows the interval to the lower half. Otherwise, it narrows it to the upper half. This process is repeated until the target value is found or the interval is empty.
-Time Complexity: O(log n), where n is the number of elements in the list. This means it takes logarithmic time relative to the number of elements.
-When to Use: Binary search is ideal for large, sorted datasets where search operations are frequent, due to its efficiency.
-
-Time Complexity Comparison:
-
-Linear Search: O(n)
-Binary Search: O(log n)
+Time Complexity: 
+𝑂
+(
+log
+⁡
+𝑛
+)
+O(logn)
+Requires the list to be sorted before searching.
+More efficient for large lists due to logarithmic growth.
 When to Use Each Algorithm:
 
 Linear Search:
 
-Use it when the dataset is small or unsorted.
-Suitable when you don't need to perform many searches, as the overhead of sorting (if necessary) for binary search might not be justified.
+Use when the list is unsorted or when dealing with very small lists.
+Can be more practical for small or dynamically changing lists where sorting is not feasible.
 Binary Search:
 
-Use it when the dataset is large and sorted.
-Ideal when frequent searches are performed because of its logarithmic time complexity, which is much faster than linear search for large datasets.
-Summary:
-
-Linear Search: Simple and versatile but less efficient for large datasets.
-Binary Search: Efficient for large, sorted datasets but requires the data to be sorted beforehand.
-By choosing the right search algorithm based on the dataset size and order, you can optimize the performance of your library management system.
+Use when the list is sorted or when it can be sorted beforehand.
+More efficient for large, static lists where the overhead of sorting is justified by the performance gain in searching.
