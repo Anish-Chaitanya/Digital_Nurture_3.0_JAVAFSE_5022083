@@ -1,0 +1,30 @@
+Linear Search:
+
+Description: Linear search, also known as sequential search, checks each element in a list sequentially until the desired element is found or the end of the list is reached.
+Time Complexity: O(n), where n is the number of elements in the list. This means in the worst-case scenario, the algorithm will look at each element once.
+When to Use: Linear search is ideal for small or unsorted datasets, or when you don't need to perform searches frequently.
+Binary Search:
+
+Description: Binary search is a more efficient algorithm that works on sorted lists. It repeatedly divides the search interval in half. If the target value is less than the item in the middle of the interval, it narrows the interval to the lower half. Otherwise, it narrows it to the upper half. This process is repeated until the target value is found or the interval is empty.
+Time Complexity: O(log n), where n is the number of elements in the list. This means it takes logarithmic time relative to the number of elements.
+When to Use: Binary search is ideal for large, sorted datasets where search operations are frequent, due to its efficiency.
+
+Time Complexity Comparison:
+
+Linear Search: O(n)
+Binary Search: O(log n)
+When to Use Each Algorithm:
+
+Linear Search:
+
+Use it when the dataset is small or unsorted.
+Suitable when you don't need to perform many searches, as the overhead of sorting (if necessary) for binary search might not be justified.
+Binary Search:
+
+Use it when the dataset is large and sorted.
+Ideal when frequent searches are performed because of its logarithmic time complexity, which is much faster than linear search for large datasets.
+Summary:
+
+Linear Search: Simple and versatile but less efficient for large datasets.
+Binary Search: Efficient for large, sorted datasets but requires the data to be sorted beforehand.
+By choosing the right search algorithm based on the dataset size and order, you can optimize the performance of your library management system.
