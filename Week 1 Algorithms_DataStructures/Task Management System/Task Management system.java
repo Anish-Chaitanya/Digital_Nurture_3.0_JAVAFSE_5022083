@@ -1,92 +1,119 @@
-class Task:
-    def __init__(self, taskId, taskName, status):
-        self.taskId = taskId
-        self.taskName = taskName
-        self.status = status
+public class TaskManagementSystem {
 
-    def __repr__(self):
-        return f"Task(ID: {self.taskId}, Name: {self.taskName}, Status: {self.status})"
+    static class Task {
+        private String taskId;
+        private String taskName;
+        private String status;
 
-class Node:
-    def __init__(self, task):
-        self.task = task
-        self.next = None
+        public Task(String taskId, String taskName, String status) {
+            this.taskId = taskId;
+            this.taskName = taskName;
+            this.status = status;
+        }
 
-class LinkedList:
-    def __init__(self):
-        self.head = None
+        public String getTaskId() { return taskId; }
+        public String getTaskName() { return taskName; }
+        public String getStatus() { return status; }
 
-    def add_task(self, task):
-        new_node = Node(task)
-        if not self.head:
-            self.head = new_node
-        else:
-            current = self.head
-            while current.next:
-                current = current.next
-            current.next = new_node
+        @Override
+        public String toString() {
+            return "Task{" +
+                   "taskId='" + taskId + '\'' +
+                   ", taskName='" + taskName + '\'' +
+                   ", status='" + status + '\'' +
+                   '}';
+        }
+    }
 
-    def search_task(self, taskId):
-        current = self.head
-        while current:
-            if current.task.taskId == taskId:
-                return current.task
-            current = current.next
-        return None
+    static class Node {
+        Task task;
+        Node next;
 
-    def delete_task(self, taskId):
-        current = self.head
-        prev = None
-        while current:
-            if current.task.taskId == taskId:
-                if prev:
-                    prev.next = current.next
-                else:
-                    self.head = current.next
-                return True
-            prev = current
-            current = current.next
-        return False
+        Node(Task task) {
+            this.task = task;
+            this.next = null;
+        }
+    }
 
-    def traverse(self):
-        tasks = []
-        current = self.head
-        while current:
-            tasks.append(current.task)
-            current = current.next
-        return tasks
+    static class TaskLinkedList {
+        private Node head;
 
-# Example usage:
-if __name__ == "__main__":
-    # Create the linked list
-    task_list = LinkedList()
+        public TaskLinkedList() {
+            this.head = null;
+        }
 
-    # Add tasks
-    task_list.add_task(Task(1, "Task One", "Pending"))
-    task_list.add_task(Task(2, "Task Two", "Completed"))
-    task_list.add_task(Task(3, "Task Three", "In Progress"))
+        public void addTask(Task task) {
+            Node newNode = new Node(task);
+            if (head == null) {
+                head = newNode;
+            } else {
+                Node current = head;
+                while (current.next != null) {
+                    current = current.next;
+                }
+                current.next = newNode;
+            }
+        }
 
-    # Print all tasks
-    print("All tasks:")
-    for task in task_list.traverse():
-        print(task)
+        public Task searchTaskById(String taskId) {
+            Node current = head;
+            while (current != null) {
+                if (current.task.getTaskId().equals(taskId)) {
+                    return current.task;
+                }
+                current = current.next;
+            }
+            return null;
+        }
 
-    # Search for a task
-    search_id = 2
-    found_task = task_list.search_task(search_id)
-    if found_task:
-        print(f"\nTask with ID {search_id} found: {found_task}")
-    else:
-        print(f"\nTask with ID {search_id} not found.")
+        public void traverseTasks() {
+            Node current = head;
+            while (current != null) {
+                System.out.println(current.task);
+                current = current.next;
+            }
+        }
 
-    # Delete a task
-    delete_id = 1
-    if task_list.delete_task(delete_id):
-        print(f"\nTask with ID {delete_id} deleted.")
-    else:
-        print(f"\nTask with ID {delete_id} not found for deletion.")
+        public void deleteTaskById(String taskId) {
+            if (head == null) return;
 
-    # Print all tasks after deletion
-    print("\nAll tasks after deletion:")
-    for task in task_list.traverse():
-        print(task)
+            if (head.task.getTaskId().equals(taskId)) {
+                head = head.next;
+                return;
+            }
+
+            Node current = head;
+            while (current.next != null && !current.next.task.getTaskId().equals(taskId)) {
+                current = current.next;
+            }
+
+            if (current.next != null) {
+                current.next = current.next.next;
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        TaskLinkedList taskList = new TaskLinkedList();
+
+        Task t1 = new Task("1", "Task 1", "Pending");
+        Task t2 = new Task("2", "Task 2", "In Progress");
+        Task t3 = new Task("3", "Task 3", "Completed");
+
+        taskList.addTask(t1);
+        taskList.addTask(t2);
+        taskList.addTask(t3);
+
+        System.out.println("All Tasks:");
+        taskList.traverseTasks();
+
+        System.out.println("\nSearch Task with ID 2:");
+        System.out.println(taskList.searchTaskById("2"));
+
+        System.out.println("\nDeleting Task with ID 2:");
+        taskList.deleteTaskById("2");
+
+        System.out.println("\nAll Tasks After Deletion:");
+        taskList.traverseTasks();
+    }
+}
