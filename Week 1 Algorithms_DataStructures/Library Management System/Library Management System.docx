@@ -11,24 +11,10 @@ If the end of the list is reached without finding a match, return an indication 
 Time Complexity:
 
 Best-case: 
-𝑂
-(
-1
-)
 O(1) (if the target is at the beginning of the list)
 Average-case: 
-𝑂
-(
-𝑛
-)
-O(n) (where 
-𝑛
-n is the number of elements in the list)
+O(n) (where n is the number of elements in the list)
 Worst-case: 
-𝑂
-(
-𝑛
-)
 O(n) (if the target is at the end or not present)
 Binary Search
 Definition:
@@ -44,50 +30,22 @@ Continue until the target value is found or the sublist size reduces to zero.
 Time Complexity:
 
 Best-case: 
-𝑂
-(
-1
-)
 O(1) (if the target is the middle element)
 Average-case: 
-𝑂
-(
-log
-⁡
-𝑛
-)
-O(logn) (where 
-𝑛
-n is the number of elements in the list)
+O(logn) (where n is the number of elements in the list)
 Worst-case: 
-𝑂
-(
-log
-⁡
-𝑛
-)
 O(logn) (if the target is not present or in the last comparison)
 Comparison of Time Complexity:
-
 Linear Search:
 
 Time Complexity: 
-𝑂
-(
-𝑛
-)
 O(n)
 Requires no pre-sorting.
 Simple and straightforward but can be slow for large lists.
 Binary Search:
 
 Time Complexity: 
-𝑂
-(
-log
-⁡
-𝑛
-)
+
 O(logn)
 Requires the list to be sorted before searching.
 More efficient for large lists due to logarithmic growth.
