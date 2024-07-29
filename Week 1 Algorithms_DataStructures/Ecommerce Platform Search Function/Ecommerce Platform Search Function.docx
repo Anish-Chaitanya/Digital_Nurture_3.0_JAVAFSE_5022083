@@ -1,0 +1,43 @@
+Big O Notation:
+
+Big O notation is a mathematical notation used to describe the upper bound of the time complexity of an algorithm in terms of the size of the input. It provides a way to express how the runtime of an algorithm scales with input size, helping in analyzing and comparing the efficiency of algorithms. It focuses on the dominant term that affects performance as the input size grows, ignoring constant factors and lower-order terms.
+
+Key Concepts:
+
+O(1): Constant time complexity, where the execution time does not depend on the input size.
+O(n): Linear time complexity, where the execution time grows linearly with the input size.
+O(log n): Logarithmic time complexity, where the execution time grows logarithmically with the input size.
+Search Operation Scenarios:
+
+Best Case: The scenario where the desired element is found immediately.
+
+Linear Search: O(1) if the element is the first in the list.
+Binary Search: O(1) if the element is the middle element.
+Average Case: The scenario where the desired element is found after examining a certain number of elements on average.
+
+Linear Search: O(n) on average.
+Binary Search: O(log n) on average.
+Worst Case: The scenario where the desired element is either not found, or found after examining the maximum number of elements.
+
+Linear Search: O(n) if the element is at the end of the list or not in the list.
+Binary Search: O(log n) if the element is not in the list.
+ 
+Time Complexity Comparison:
+
+Linear Search:
+
+Best Case: O(1)
+Average Case: O(n)
+Worst Case: O(n)
+Characteristics: Simple to implement but less efficient for large datasets.
+Binary Search:
+
+Best Case: O(1)
+Average Case: O(log n)
+Worst Case: O(log n)
+Characteristics: More efficient for large datasets but requires the array to be sorted.
+Which Algorithm is More Suitable:
+
+Linear Search is more suitable for unsorted datasets or small datasets where sorting is not practical. It has a straightforward implementation but can be inefficient for larger datasets.
+
+Binary Search is more suitable for large datasets where the array is sorted or can be sorted. It provides faster search times, especially for large datasets, due to its logarithmic time complexity.
