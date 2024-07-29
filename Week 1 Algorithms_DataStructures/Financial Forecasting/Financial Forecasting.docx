@@ -1,0 +1,35 @@
+Concept of Recursion:
+
+Recursion is a programming technique where a function calls itself directly or indirectly to solve a problem. A recursive algorithm typically breaks a problem into smaller, more manageable sub-problems until it reaches a base case, which is simple enough to solve directly.
+
+Advantages of Recursion:
+
+Simplification: Recursion can simplify complex problems by breaking them down into smaller, similar problems. It often results in cleaner and more understandable code.
+Divide and Conquer: Recursion is useful for problems that can be divided into similar sub-problems, such as tree traversals, factorial calculations, and Fibonacci sequences.
+Example Problem: Predicting future values based on past growth rates can be naturally modeled using recursion. For instance, if you know the past value and growth rate, you can recursively calculate future values by applying the growth rate over multiple periods.
+Time Complexity:
+
+Time Complexity: The time complexity of the recursive calculateFutureValue method is 
+𝑂
+(
+𝑛
+)
+O(n), where 
+𝑛
+n is the number of periods. This is because each recursive call performs a constant amount of work and there are 
+𝑛
+n recursive calls.
+Optimization:
+
+Memoization: To avoid excessive computation and repeated calculations, you can use memoization to store previously computed results. This is particularly useful if the same sub-problems are solved multiple times. However, in this simple example, each sub-problem is unique, so memoization may not provide a significant benefit.
+Iterative Approach: For larger numbers of periods, an iterative approach might be more efficient. The iterative solution would avoid the overhead of recursive function calls and stack usage, providing 
+𝑂
+(
+𝑛
+)
+O(n) time complexity but with lower space complexity.
+Comparison:
+
+Recursive Approach: Easy to understand and implement but may lead to a stack overflow error with large n due to deep recursion.
+Iterative Approach: More efficient in terms of space as it avoids recursion depth issues but achieves the same time complexity.
+In summary, recursion can simplify the problem, but for practical use, especially with large inputs, an iterative approach or memoization may be preferred to optimize performance and resource usage.
