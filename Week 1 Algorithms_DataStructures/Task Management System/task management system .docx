@@ -1,0 +1,19 @@
+Linked Lists are data structures used to store a sequence of elements. They consist of nodes, where each node contains data and a reference (or link) to the next node in the sequence. The main types of linked lists are:
+
+Singly Linked List: Each node has a single link to the next node. This allows for a straightforward traversal in one direction (from the head to the end of the list).
+ Doubly Linked List: Each node has two links: one to the next node and one to the previous node. This allows for traversal in both directions.
+  Time Complexity
+Add Task: O(n) - Adding a task at the end requires traversal of the list to find the end.
+Search Task: O(n) - Searching involves traversing the list to find the task with the specified ID.
+Delete Task: O(n) - Deleting a task requires finding it first, which involves traversing the list.
+Traverse: O(n) - Traversing the list involves visiting each node.
+Advantages of Linked Lists Over Arrays
+Dynamic Size: Linked lists can grow and shrink in size dynamically without the need for reallocation or resizing, whereas arrays have a fixed size.
+Efficient Insertions/Deletions: Inserting or deleting elements is more efficient in linked lists compared to arrays, especially when the position is known. In arrays, these operations can require shifting elements, which can be costly.
+No Wasted Space: Linked lists allocate memory only for the elements that are actually in use, whereas arrays may allocate more memory than needed, leading to wasted space.
+Summary
+In summary, for your task management system:
+
+Singly Linked Lists provide an efficient way to manage tasks dynamically with simple operations for adding, searching, deleting, and traversing tasks.
+The time complexities of these operations generally involve linear time due to the need to traverse the list, which is a trade-off compared to arrays.
+Linked lists are advantageous in scenarios where dynamic resizing and frequent insertions/deletions are needed.
