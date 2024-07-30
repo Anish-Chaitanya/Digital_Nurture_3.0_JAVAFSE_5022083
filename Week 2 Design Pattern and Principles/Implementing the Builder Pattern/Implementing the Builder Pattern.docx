@@ -1,4 +1,0 @@
-Explanation
-Product Class (Computer): This class represents the complex object with various attributes. It has a private constructor that takes a Builder object.
-Builder Class: This static nested class is used to build the Computer object. It has methods to set the optional parameters and a build() method to create the final Computer object.
-Test Class (BuilderPatternTest): This class demonstrates how to use the Builder pattern to create Computer objects with different configurations. It shows the flexibility of the pattern in constructing objects with varying levels of detail.
