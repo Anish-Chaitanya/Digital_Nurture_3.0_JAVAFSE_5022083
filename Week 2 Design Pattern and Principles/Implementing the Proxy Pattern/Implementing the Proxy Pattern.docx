@@ -1,1 +1,9 @@
 
+Explanation
+Subject Interface (Image): Defines the common interface for RealImage and ProxyImage with the display() method.
+
+Real Subject Class (RealImage): Implements the Image interface. It represents the actual object that loads an image from a remote server (simulated with a delay) and displays it.
+
+Proxy Class (ProxyImage): Also implements the Image interface and holds a reference to RealImage. It manages the creation and access to RealImage, providing lazy initialization (loading RealImage only when display() is called for the first time) and caching (reusing the RealImage instance for subsequent calls).
+
+Test Class (ProxyPatternTest): Demonstrates the functionality of ProxyImage by simulating the loading and displaying of images. The output shows that the images are loaded only when needed (lazy initialization) and subsequent displays are fast (caching).
