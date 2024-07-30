@@ -1,1 +1,16 @@
+Explanation
+Strategy Interface (PaymentStrategy):
 
+Defines a method pay(double amount) that all concrete payment strategies must implement.
+Concrete Strategies (CreditCardPayment, PayPalPayment):
+
+Implement the PaymentStrategy interface.
+Each class provides its own implementation of the pay() method, tailored to the specific payment method (e.g., credit card or PayPal).
+Context Class (PaymentContext):
+
+Holds a reference to a PaymentStrategy object.
+Provides a method setPaymentStrategy() to set the desired payment strategy and executePayment() to execute the payment using the current strategy.
+Test Class (StrategyPatternTest):
+
+Demonstrates how to use different payment strategies.
+Shows setting the payment strategy to CreditCardPayment and PayPalPayment and executing payments with those strategies.
