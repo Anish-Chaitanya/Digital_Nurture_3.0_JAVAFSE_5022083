@@ -1,1 +1,18 @@
+Explanation of the Code Structure
+Command Interface (Command):
 
+Defines the execute() method that all concrete commands must implement.
+Concrete Commands (LightOnCommand, LightOffCommand):
+
+Implement the Command interface.
+Each command class encapsulates a request to perform a specific action (turnOn or turnOff) on the Light receiver.
+Invoker Class (RemoteControl):
+
+Holds a reference to a Command object.
+Provides a method setCommand() to set the command and pressButton() to execute the command.
+Receiver Class (Light):
+
+Contains the methods turnOn() and turnOff() to perform the actual operations.
+Test Class (CommandPatternTest):
+
+Demonstrates how to use RemoteControl to issue commands (LightOnCommand and LightOffCommand) to the Light receiver.
