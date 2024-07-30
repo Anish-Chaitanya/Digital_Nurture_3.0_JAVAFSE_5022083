@@ -1,1 +1,10 @@
+Explanation
+Subject Interface (Stock): Defines methods for attaching, detaching, and notifying observers.
 
+Concrete Subject (StockMarket): Implements the Stock interface. It maintains a list of observers and notifies them of changes to the stock price. The setStockPrice(double price) method changes the stock price and triggers the notification of observers.
+
+Observer Interface (Observer): Defines the update(double stockPrice) method, which observers implement to respond to changes in the subject.
+
+Concrete Observers (MobileApp, WebApp): Implement the Observer interface and define the update(double stockPrice) method to react to updates from the StockMarket.
+
+Test Class (ObserverPatternTest): Demonstrates the creation of a StockMarket instance, registering observers (MobileApp and WebApp), updating stock prices, and notifying the observers of these changes.
