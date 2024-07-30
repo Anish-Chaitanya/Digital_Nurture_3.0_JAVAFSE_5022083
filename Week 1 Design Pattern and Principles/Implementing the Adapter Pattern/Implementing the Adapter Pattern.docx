@@ -1,0 +1,5 @@
+Explanation
+Target Interface (PaymentProcessor): Defines a common method processPayment() that all adapters must implement.
+Adaptee Classes: These are the existing classes (PayPal, Stripe, Square) that have their own interfaces for processing payments.
+Adapter Classes: Implement the PaymentProcessor interface and translate calls from processPayment() to the specific methods of the corresponding payment gateway.
+Test Class (AdapterPatternTest): Demonstrates the use of the adapters to process payments through different payment gateways.

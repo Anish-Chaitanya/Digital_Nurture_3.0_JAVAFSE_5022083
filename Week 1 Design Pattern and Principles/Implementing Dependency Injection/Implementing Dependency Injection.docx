@@ -1,0 +1,21 @@
+Explanation of the Code
+Repository Interface (CustomerRepository):
+
+Defines the method findCustomerById(int id) which will be implemented by the concrete repository.
+Concrete Repository Implementation (CustomerRepositoryImpl):
+
+Implements the CustomerRepository interface.
+Provides a dummy implementation of findCustomerById() for demonstration purposes.
+Model Class (Customer):
+
+Represents a customer with attributes like id, name, and email.
+Provides getter methods and a toString() method for displaying customer details.
+Service Class (CustomerService):
+
+Depends on CustomerRepository to fetch customer data.
+Uses constructor injection to receive an instance of CustomerRepository.
+Provides a method getCustomerById() to get a customer from the repository.
+Test Class (main method):
+
+Demonstrates how to create a CustomerRepositoryImpl and inject it into CustomerService.
+Uses the service to fetch a customer and prints the customer details.

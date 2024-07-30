@@ -1,0 +1,6 @@
+Summary
+Document: Interface for all document types.
+WordDocument, PdfDocument, ExcelDocument: Concrete implementations of Document.
+DocumentFactory: Abstract class with the factory method createDocument().
+WordDocumentFactory, PdfDocumentFactory, ExcelDocumentFactory: Concrete factories that create instances of the respective document types.
+FactoryMethodTest: Tests the creation and use of different document types through their factories.

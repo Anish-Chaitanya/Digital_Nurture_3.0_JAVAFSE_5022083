@@ -1,0 +1,10 @@
+Explanation
+Component Interface (Notifier): Defines the common interface for all concrete components and decorators with a send(String message) method.
+
+Concrete Component (EmailNotifier): Implements the Notifier interface and provides basic functionality to send an email notification.
+
+Abstract Decorator (NotifierDecorator): Implements the Notifier interface and contains a reference to a Notifier object. It delegates the send method call to the wrapped notifier object.
+
+Concrete Decorator Classes (SMSNotifierDecorator, SlackNotifierDecorator): Extend NotifierDecorator to add additional functionalities. They call the send method of the wrapped notifier and add their own behavior (e.g., sending SMS or Slack messages).
+
+Test Class (DecoratorPatternTest): Demonstrates how to use the decorators to extend the functionality of the Notifier dynamically. It shows how to combine different notification channels using decorators.
