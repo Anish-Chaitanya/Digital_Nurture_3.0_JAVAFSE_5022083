@@ -7,8 +7,11 @@
     <!-- Bean definition for BookRepository -->
     <bean id="bookRepository" class="com.library.repository.BookRepository"/>
 
-    <!-- Bean definition for BookService with constructor injection -->
+    <!-- Bean definition for BookService with constructor injection and potential setter injection -->
     <bean id="bookService" class="com.library.service.BookService">
+        <!-- Constructor injection -->
         <constructor-arg ref="bookRepository"/>
+        <!-- Setter injection (optional, if needed to override constructor injection) -->
+        <!-- <property name="bookRepository" ref="bookRepository"/> -->
     </bean>
 </beans>
