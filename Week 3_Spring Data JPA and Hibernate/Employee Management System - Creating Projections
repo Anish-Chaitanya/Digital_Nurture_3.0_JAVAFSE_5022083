@@ -1,0 +1,152 @@
+package com.example.EmployeeManagementSystem;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@SpringBootApplication
+public class EmployeeManagementSystemApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(EmployeeManagementSystemApplication.class, args);
+    }
+}
+
+// Entities
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+class Employee {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String firstName;
+    private String lastName;
+    private String email;
+
+    @ManyToOne
+    @JoinColumn(name = "department_id", nullable = false)
+    private Department department;
+}
+
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+class Department {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
+
+    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
+    private List<Employee> employees;
+}
+
+// Interface-based Projection for Employee
+interface EmployeeNameProjection {
+    String getFirstName();
+    String getLastName();
+}
+
+// Class-based Projection for Employee
+class EmployeeDTO {
+    private final String firstName;
+    private final String lastName;
+    private final String email;
+
+    public EmployeeDTO(String firstName, String lastName, String email) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+    }
+
+    // Getters
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+}
+
+// Class-based Projection for Department
+class DepartmentDTO {
+    private final String name;
+    private final List<EmployeeDTO> employees;
+
+    public DepartmentDTO(String name, List<EmployeeDTO> employees) {
+        this.name = name;
+        this.employees = employees;
+    }
+
+    // Getters
+    public String getName() {
+        return name;
+    }
+
+    public List<EmployeeDTO> getEmployees() {
+        return employees;
+    }
+}
+
+// Repositories
+@Repository
+interface EmployeeRepository extends JpaRepository<Employee, Long> {
+    List<EmployeeNameProjection> findAllByDepartmentId(Long departmentId);
+
+    @Query("SELECT new com.example.EmployeeManagementSystem.EmployeeDTO(e.firstName, e.lastName, e.email) " +
+           "FROM Employee e WHERE e.department.id = :departmentId")
+    List<EmployeeDTO> findEmployeeDTOsByDepartmentId(Long departmentId);
+}
+
+@Repository
+interface DepartmentRepository extends JpaRepository<Department, Long> {
+
+    @Query("SELECT new com.example.EmployeeManagementSystem.DepartmentDTO(d.name, " +
+           "(SELECT new com.example.EmployeeManagementSystem.EmployeeDTO(e.firstName, e.lastName, e.email) " +
+           "FROM Employee e WHERE e.department.id = d.id)) " +
+           "FROM Department d WHERE d.id = :departmentId")
+    DepartmentDTO findDepartmentWithEmployees(Long departmentId);
+}
+
+// Service
+@Service
+@Transactional
+class EmployeeService {
+    private final EmployeeRepository employeeRepository;
+    private final DepartmentRepository departmentRepository;
+
+    public EmployeeService(EmployeeRepository employeeRepository, DepartmentRepository departmentRepository) {
+        this.employeeRepository = employeeRepository;
+        this.departmentRepository = departmentRepository;
+    }
+
+    public List<EmployeeNameProjection> getEmployeeNamesByDepartmentId(Long departmentId) {
+        return employeeRepository.findAllByDepartmentId(departmentId);
+    }
+
+    public List<EmployeeDTO> getEmployeeDTOsByDepartmentId(Long departmentId) {
+        return employeeRepository.findEmployeeDTOsByDepartmentId(departmentId);
+    }
+
+    public DepartmentDTO getDepartmentWithEmployees(Long departmentId) {
+        return departmentRepository.findDepartmentWithEmployees(departmentId);
+    }
+}
