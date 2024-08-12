@@ -1,1 +1,126 @@
+package com.example.EmployeeManagementSystem;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
+@SpringBootApplication
+@EnableJpaAuditing(auditorAwareRef = "auditorProvider")
+public class EmployeeManagementSystemApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(EmployeeManagementSystemApplication.class, args);
+    }
+}
+
+@MappedSuperclass
+@EntityListeners(AuditingEntityListener.class)
+@Getter
+@Setter
+abstract class Auditable {
+
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdDate;
+
+    @LastModifiedDate
+    private LocalDateTime lastModifiedDate;
+
+    @CreatedBy
+    @Column(updatable = false)
+    private String createdBy;
+
+    @LastModifiedBy
+    private String lastModifiedBy;
+}
+
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+class Employee extends Auditable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String firstName;
+    private String lastName;
+    private String email;
+
+    @ManyToOne
+    @JoinColumn(name = "department_id", nullable = false)
+    private Department department;
+}
+
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+class Department extends Auditable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+
+    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
+    private List<Employee> employees;
+}
+
+@Configuration
+class AuditConfig {
+
+    @Bean
+    public AuditorAware<String> auditorProvider() {
+        // Logic to retrieve the current user, for example from Spring Security context
+        return () -> Optional.of("admin"); // Replace "admin" with actual logic to get the current user
+    }
+}
+
+@Repository
+interface EmployeeRepository extends JpaRepository<Employee, Long> {}
+
+@Repository
+interface DepartmentRepository extends JpaRepository<Department, Long> {}
+
+@Service
+class EmployeeService {
+    private final EmployeeRepository employeeRepository;
+    private final DepartmentRepository departmentRepository;
+
+    public EmployeeService(EmployeeRepository employeeRepository, DepartmentRepository departmentRepository) {
+        this.employeeRepository = employeeRepository;
+        this.departmentRepository = departmentRepository;
+    }
+
+    // Example methods to create an employee and a department
+    public Employee createEmployee(Employee employee) {
+        return employeeRepository.save(employee);
+    }
+
+    public Department createDepartment(Department department) {
+        return departmentRepository.save(department);
+    }
+}
 
