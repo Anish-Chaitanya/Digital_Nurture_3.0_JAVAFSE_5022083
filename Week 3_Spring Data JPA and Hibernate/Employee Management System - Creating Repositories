@@ -1,0 +1,25 @@
+package com.example.EmployeeManagementSystem.repository;
+
+import com.example.EmployeeManagementSystem.entity.Employee;
+import com.example.EmployeeManagementSystem.entity.Department;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface EmployeeRepository extends JpaRepository<Employee, Long> {
+    
+    // Custom query method to find employees by department
+    List<Employee> findByDepartmentId(Long departmentId);
+
+    // Custom query method to find employees by last name
+    List<Employee> findByLastName(String lastName);
+}
+
+@Repository
+public interface DepartmentRepository extends JpaRepository<Department, Long> {
+    
+    // Custom query method to find departments by name
+    Department findByName(String name);
+}
