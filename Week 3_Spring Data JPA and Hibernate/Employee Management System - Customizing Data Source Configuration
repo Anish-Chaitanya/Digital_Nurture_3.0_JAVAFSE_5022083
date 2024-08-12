@@ -1,0 +1,160 @@
+package com.example.EmployeeManagementSystem;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.sql.DataSource;
+import java.util.List;
+
+@SpringBootApplication
+public class EmployeeManagementSystemApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(EmployeeManagementSystemApplication.class, args);
+    }
+}
+
+// Entities
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+class Employee {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String firstName;
+    private String lastName;
+    private String email;
+}
+
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+class Department {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
+}
+
+// Repositories
+@Repository
+interface EmployeeRepository extends JpaRepository<Employee, Long> {
+}
+
+@Repository
+interface DepartmentRepository extends JpaRepository<Department, Long> {
+}
+
+// Service Layer
+@Service
+@Transactional
+class EmployeeService {
+
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
+    @Autowired
+    private DepartmentRepository departmentRepository;
+
+    public List<Employee> getAllEmployees() {
+        return employeeRepository.findAll();
+    }
+
+    public List<Department> getAllDepartments() {
+        return departmentRepository.findAll();
+    }
+}
+
+// Data Source Configuration
+@Configuration
+class DataSourceConfig {
+
+    @Primary
+    @Bean(name = "employeeDataSource")
+    @ConfigurationProperties(prefix = "spring.datasource")
+    public DataSource employeeDataSource() {
+        return DataSourceBuilder.create().build();
+    }
+
+    @Bean(name = "departmentDataSource")
+    @ConfigurationProperties(prefix = "spring.datasource.department")
+    public DataSource departmentDataSource() {
+        return DataSourceBuilder.create().build();
+    }
+
+    @Primary
+    @Bean(name = "employeeEntityManagerFactory")
+    public LocalContainerEntityManagerFactoryBean employeeEntityManagerFactory(
+            @Autowired @Qualifier("employeeDataSource") DataSource dataSource) {
+        LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
+        factoryBean.setDataSource(dataSource);
+        factoryBean.setPackagesToScan("com.example.EmployeeManagementSystem");
+        factoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+        return factoryBean;
+    }
+
+    @Bean(name = "departmentEntityManagerFactory")
+    public LocalContainerEntityManagerFactoryBean departmentEntityManagerFactory(
+            @Autowired @Qualifier("departmentDataSource") DataSource dataSource) {
+        LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
+        factoryBean.setDataSource(dataSource);
+        factoryBean.setPackagesToScan("com.example.EmployeeManagementSystem");
+        factoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+        return factoryBean;
+    }
+
+    @Primary
+    @Bean(name = "employeeTransactionManager")
+    public PlatformTransactionManager employeeTransactionManager(
+            @Autowired @Qualifier("employeeEntityManagerFactory") LocalContainerEntityManagerFactoryBean employeeEntityManagerFactory) {
+        return new JpaTransactionManager(employeeEntityManagerFactory.getObject());
+    }
+
+    @Bean(name = "departmentTransactionManager")
+    public PlatformTransactionManager departmentTransactionManager(
+            @Autowired @Qualifier("departmentEntityManagerFactory") LocalContainerEntityManagerFactoryBean departmentEntityManagerFactory) {
+        return new JpaTransactionManager(departmentEntityManagerFactory.getObject());
+    }
+}
+
+
+
+
+\\application.properties
+
+# Default DataSource Configuration
+spring.datasource.url=jdbc:h2:mem:employeedb
+spring.datasource.username=sa
+spring.datasource.password=password
+spring.datasource.driver-class-name=org.h2.Driver
+spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
+
+# Additional DataSource for Department
+spring.datasource.department.url=jdbc:h2:mem:departmentdb
+spring.datasource.department.username=sa
+spring.datasource.department.password=password
+spring.datasource.department.driver-class-name=org.h2.Driver
