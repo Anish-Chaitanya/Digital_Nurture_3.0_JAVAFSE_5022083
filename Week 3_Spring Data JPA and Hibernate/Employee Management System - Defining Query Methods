@@ -1,0 +1,172 @@
+package com.example.EmployeeManagementSystem;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.*;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+
+@SpringBootApplication
+public class EmployeeManagementSystemApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(EmployeeManagementSystemApplication.class, args);
+    }
+}
+
+// Entity Classes
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+class Employee {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String firstName;
+    private String lastName;
+    private String email;
+
+    @ManyToOne
+    @JoinColumn(name = "department_id", nullable = false)
+    private Department department;
+}
+
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+class Department {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+
+    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
+    private List<Employee> employees;
+}
+
+// Repository Interfaces with Query Methods
+@Repository
+interface EmployeeRepository extends JpaRepository<Employee, Long> {
+    
+    // Find employees by department ID
+    List<Employee> findByDepartmentId(Long departmentId);
+    
+    // Find employees by last name
+    List<Employee> findByLastName(String lastName);
+    
+    // Find employees by first name and last name
+    List<Employee> findByFirstNameAndLastName(String firstName, String lastName);
+    
+    // Find employees with email containing a specific domain
+    List<Employee> findByEmailContaining(String domain);
+}
+
+@Repository
+interface DepartmentRepository extends JpaRepository<Department, Long> {
+    
+    // Find departments by name
+    Department findByName(String name);
+    
+    // Find all departments with a specific employee count
+    @Query("SELECT d FROM Department d WHERE SIZE(d.employees) = ?1")
+    List<Department> findByEmployeeCount(int count);
+}
+
+// Service Classes
+@Service
+class EmployeeService {
+
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
+    public List<Employee> getEmployeesByDepartmentId(Long departmentId) {
+        return employeeRepository.findByDepartmentId(departmentId);
+    }
+
+    public List<Employee> getEmployeesByLastName(String lastName) {
+        return employeeRepository.findByLastName(lastName);
+    }
+
+    public List<Employee> getEmployeesByFirstNameAndLastName(String firstName, String lastName) {
+        return employeeRepository.findByFirstNameAndLastName(firstName, lastName);
+    }
+
+    public List<Employee> getEmployeesByEmailDomain(String domain) {
+        return employeeRepository.findByEmailContaining(domain);
+    }
+}
+
+@Service
+class DepartmentService {
+
+    @Autowired
+    private DepartmentRepository departmentRepository;
+
+    public Department getDepartmentByName(String name) {
+        return departmentRepository.findByName(name);
+    }
+
+    public List<Department> getDepartmentsByEmployeeCount(int count) {
+        return departmentRepository.findByEmployeeCount(count);
+    }
+}
+
+// Controller Classes
+@RestController
+@RequestMapping("/employees")
+class EmployeeController {
+
+    @Autowired
+    private EmployeeService employeeService;
+
+    @GetMapping("/department/{departmentId}")
+    public List<Employee> getEmployeesByDepartment(@PathVariable Long departmentId) {
+        return employeeService.getEmployeesByDepartmentId(departmentId);
+    }
+
+    @GetMapping("/lastname/{lastName}")
+    public List<Employee> getEmployeesByLastName(@PathVariable String lastName) {
+        return employeeService.getEmployeesByLastName(lastName);
+    }
+
+    @GetMapping("/name")
+    public List<Employee> getEmployeesByFullName(@RequestParam String firstName, @RequestParam String lastName) {
+        return employeeService.getEmployeesByFirstNameAndLastName(firstName, lastName);
+    }
+
+    @GetMapping("/email")
+    public List<Employee> getEmployeesByEmailDomain(@RequestParam String domain) {
+        return employeeService.getEmployeesByEmailDomain(domain);
+    }
+}
+
+@RestController
+@RequestMapping("/departments")
+class DepartmentController {
+
+    @Autowired
+    private DepartmentService departmentService;
+
+    @GetMapping("/name/{name}")
+    public Department getDepartmentByName(@PathVariable String name) {
+        return departmentService.getDepartmentByName(name);
+    }
+
+    @GetMapping("/employee-count")
+    public List<Department> getDepartmentsByEmployeeCount(@RequestParam int count) {
+        return departmentService.getDepartmentsByEmployeeCount(count);
+    }
+}
