@@ -1,0 +1,150 @@
+package com.example.EmployeeManagementSystem;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.List;
+
+@SpringBootApplication
+public class EmployeeManagementSystemApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(EmployeeManagementSystemApplication.class, args);
+    }
+}
+
+// Entities with Hibernate-Specific Annotations
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@DynamicInsert
+@DynamicUpdate
+@BatchSize(size = 10)
+class Employee {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String firstName;
+    private String lastName;
+    private String email;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id", nullable = false)
+    @Fetch(FetchMode.SELECT)
+    private Department department;
+}
+
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@BatchSize(size = 10)
+class Department {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String name;
+
+    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Employee> employees = new ArrayList<>();
+}
+
+// Repositories
+@Repository
+interface EmployeeRepository extends JpaRepository<Employee, Long> {
+}
+
+@Repository
+interface DepartmentRepository extends JpaRepository<Department, Long> {
+}
+
+// Service Layer with Batch Processing
+@Service
+@Transactional
+class EmployeeService {
+
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
+    @Autowired
+    private DepartmentRepository departmentRepository;
+
+    // Batch Insert Employees
+    public void batchInsertEmployees(List<Employee> employees) {
+        employeeRepository.saveAll(employees);
+    }
+
+    // Batch Update Employees
+    public void batchUpdateEmployees(List<Employee> employees) {
+        employeeRepository.saveAll(employees);
+    }
+
+    public List<Employee> getAllEmployees() {
+        return employeeRepository.findAll();
+    }
+
+    public List<Department> getAllDepartments() {
+        return departmentRepository.findAll();
+    }
+}
+
+// Hibernate-Specific Configuration
+@Configuration
+class HibernateConfig {
+
+    @Bean
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
+        LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
+        factoryBean.setDataSource(dataSource);
+        factoryBean.setPackagesToScan("com.example.EmployeeManagementSystem");
+        factoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+
+        // Hibernate-specific properties
+        factoryBean.getJpaPropertyMap().put("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
+        factoryBean.getJpaPropertyMap().put("hibernate.jdbc.batch_size", "20");
+        factoryBean.getJpaPropertyMap().put("hibernate.order_inserts", "true");
+        factoryBean.getJpaPropertyMap().put("hibernate.order_updates", "true");
+        factoryBean.getJpaPropertyMap().put("hibernate.jdbc.batch_versioned_data", "true");
+
+        return factoryBean;
+    }
+
+    @Bean
+    public PlatformTransactionManager transactionManager(LocalContainerEntityManagerFactoryBean entityManagerFactory) {
+        return new JpaTransactionManager(entityManagerFactory.getObject());
+    }
+}
+
+
+
+\\ application.properties
+# Hibernate Dialect and Batch Processing Configuration
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.H2Dialect
+spring.jpa.properties.hibernate.jdbc.batch_size=20
+spring.jpa.properties.hibernate.order_inserts=true
+spring.jpa.properties.hibernate.order_updates=true
+spring.jpa.properties.hibernate.jdbc.batch_versioned_data=true
+
