@@ -1,0 +1,138 @@
+package com.example.EmployeeManagementSystem;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.*;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+
+@SpringBootApplication
+public class EmployeeManagementSystemApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(EmployeeManagementSystemApplication.class, args);
+    }
+}
+
+// Entity Classes
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+class Employee {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String firstName;
+    private String lastName;
+    private String email;
+
+    @ManyToOne
+    @JoinColumn(name = "department_id", nullable = false)
+    private Department department;
+}
+
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+class Department {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String name;
+
+    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL)
+    private List<Employee> employees;
+}
+
+// Repository Interface with Pagination and Sorting
+@Repository
+interface EmployeeRepository extends JpaRepository<Employee, Long> {
+
+    // Pagination and sorting method for all employees
+    Page<Employee> findAll(Pageable pageable);
+
+    // Pagination and sorting method for employees by department
+    Page<Employee> findByDepartmentId(Long departmentId, Pageable pageable);
+
+    // Pagination and sorting method for employees by last name
+    Page<Employee> findByLastName(String lastName, Pageable pageable);
+}
+
+// Service Class
+@Service
+class EmployeeService {
+
+    @Autowired
+    private EmployeeRepository employeeRepository;
+
+    public Page<Employee> getAllEmployees(int page, int size, String sortBy, String sortDir) {
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(sortDir), sortBy);
+        return employeeRepository.findAll(pageable);
+    }
+
+    public Page<Employee> getEmployeesByDepartmentId(Long departmentId, int page, int size, String sortBy, String sortDir) {
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(sortDir), sortBy);
+        return employeeRepository.findByDepartmentId(departmentId, pageable);
+    }
+
+    public Page<Employee> getEmployeesByLastName(String lastName, int page, int size, String sortBy, String sortDir) {
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(sortDir), sortBy);
+        return employeeRepository.findByLastName(lastName, pageable);
+    }
+}
+
+// Controller Class
+@RestController
+@RequestMapping("/employees")
+class EmployeeController {
+
+    @Autowired
+    private EmployeeService employeeService;
+
+    @GetMapping
+    public Page<Employee> getAllEmployees(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir) {
+        return employeeService.getAllEmployees(page, size, sortBy, sortDir);
+    }
+
+    @GetMapping("/department/{departmentId}")
+    public Page<Employee> getEmployeesByDepartmentId(
+            @PathVariable Long departmentId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir) {
+        return employeeService.getEmployeesByDepartmentId(departmentId, page, size, sortBy, sortDir);
+    }
+
+    @GetMapping("/lastname/{lastName}")
+    public Page<Employee> getEmployeesByLastName(
+            @PathVariable String lastName,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir) {
+        return employeeService.getEmployeesByLastName(lastName, page, size, sortBy, sortDir);
+    }
+}
+
