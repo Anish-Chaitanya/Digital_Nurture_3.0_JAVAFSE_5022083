@@ -1,0 +1,15 @@
+Spring Boot 3 introduced several new features and improvements:
+
+Java 17 Support: Spring Boot 3 requires Java 17 or above, leveraging modern Java language features and performance improvements.
+
+Improved Native Image Support: Spring Boot 3 has better support for creating native executables using GraalVM, which allows for faster startup times and lower memory usage.
+
+Observability Improvements: Spring Boot 3 introduces enhanced observability features, including better support for distributed tracing, metrics, and logs integration.
+
+HTTP Interface Clients: You can now use HTTP interfaces as a declarative way to define REST client interfaces, simplifying HTTP calls.
+
+Declarative HTTP Clients with WebClient: Spring Boot 3 allows you to create declarative HTTP clients using WebClient, making it easier to manage external RESTful service calls.
+
+Updated Security Features: Spring Boot 3 includes updated security configurations and OAuth2 enhancements.
+
+Updated Third-Party Libraries: Libraries like Spring Framework, Spring Data, and others have been updated to their latest versions, providing new features and better performance.
