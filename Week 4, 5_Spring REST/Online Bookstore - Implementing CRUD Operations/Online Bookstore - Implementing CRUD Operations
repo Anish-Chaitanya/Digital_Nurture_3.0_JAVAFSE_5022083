@@ -1,0 +1,240 @@
+package com.example.bookstoreapi;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.*;
+
+import javax.persistence.*;
+import javax.validation.Valid;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.util.List;
+
+@SpringBootApplication
+public class BookstoreApiApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(BookstoreApiApplication.class, args);
+    }
+}
+
+// Entity for Book with Optimistic Locking
+@Entity
+class Book {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotNull
+    @Size(min = 1, max = 100)
+    private String title;
+
+    @NotNull
+    @Size(min = 1, max = 100)
+    private String author;
+
+    @NotNull
+    @Size(min = 10, max = 13)
+    private String isbn;
+
+    @NotNull
+    @Min(0)
+    private double price;
+
+    @Version
+    private int version;
+
+    // Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+
+    public String getAuthor() { return author; }
+    public void setAuthor(String author) { this.author = author; }
+
+    public String getIsbn() { return isbn; }
+    public void setIsbn(String isbn) { this.isbn = isbn; }
+
+    public double getPrice() { return price; }
+    public void setPrice(double price) { this.price = price; }
+
+    public int getVersion() { return version; }
+    public void setVersion(int version) { this.version = version; }
+}
+
+// Entity for Customer with Optimistic Locking
+@Entity
+class Customer {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotNull
+    @Size(min = 1, max = 100)
+    private String name;
+
+    @NotNull
+    @Email
+    private String email;
+
+    @Version
+    private int version;
+
+    // Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public int getVersion() { return version; }
+    public void setVersion(int version) { this.version = version; }
+}
+
+// Repositories
+@Repository
+interface BookRepository extends JpaRepository<Book, Long> {}
+
+@Repository
+interface CustomerRepository extends JpaRepository<Customer, Long> {}
+
+// Services
+@Service
+class BookService {
+    private final BookRepository bookRepository;
+
+    public BookService(BookRepository bookRepository) {
+        this.bookRepository = bookRepository;
+    }
+
+    public List<Book> getAllBooks() {
+        return bookRepository.findAll();
+    }
+
+    public Book getBookById(Long id) {
+        return bookRepository.findById(id).orElseThrow(() -> new RuntimeException("Book not found"));
+    }
+
+    public Book addBook(Book book) {
+        return bookRepository.save(book);
+    }
+
+    public Book updateBook(Long id, Book book) {
+        book.setId(id);
+        return bookRepository.save(book);
+    }
+
+    public void deleteBook(Long id) {
+        bookRepository.deleteById(id);
+    }
+}
+
+@Service
+class CustomerService {
+    private final CustomerRepository customerRepository;
+
+    public CustomerService(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
+    }
+
+    public List<Customer> getAllCustomers() {
+        return customerRepository.findAll();
+    }
+
+    public Customer getCustomerById(Long id) {
+        return customerRepository.findById(id).orElseThrow(() -> new RuntimeException("Customer not found"));
+    }
+
+    public Customer addCustomer(Customer customer) {
+        return customerRepository.save(customer);
+    }
+
+    public Customer updateCustomer(Long id, Customer customer) {
+        customer.setId(id);
+        return customerRepository.save(customer);
+    }
+
+    public void deleteCustomer(Long id) {
+        customerRepository.deleteById(id);
+    }
+}
+
+// Controller
+@RestController
+@RequestMapping("/api")
+class BookstoreController {
+    private final BookService bookService;
+    private final CustomerService customerService;
+
+    public BookstoreController(BookService bookService, CustomerService customerService) {
+        this.bookService = bookService;
+        this.customerService = customerService;
+    }
+
+    // Book Endpoints
+    @GetMapping("/books")
+    public List<Book> getAllBooks() {
+        return bookService.getAllBooks();
+    }
+
+    @GetMapping("/books/{id}")
+    public Book getBookById(@PathVariable Long id) {
+        return bookService.getBookById(id);
+    }
+
+    @PostMapping("/books")
+    public ResponseEntity<Book> addBook(@Valid @RequestBody Book book) {
+        Book savedBook = bookService.addBook(book);
+        return new ResponseEntity<>(savedBook, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/books/{id}")
+    public Book updateBook(@PathVariable Long id, @Valid @RequestBody Book book) {
+        return bookService.updateBook(id, book);
+    }
+
+    @DeleteMapping("/books/{id}")
+    public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
+        bookService.deleteBook(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    // Customer Endpoints
+    @GetMapping("/customers")
+    public List<Customer> getAllCustomers() {
+        return customerService.getAllCustomers();
+    }
+
+    @GetMapping("/customers/{id}")
+    public Customer getCustomerById(@PathVariable Long id) {
+        return customerService.getCustomerById(id);
+    }
+
+    @PostMapping("/customers")
+    public ResponseEntity<Customer> addCustomer(@Valid @RequestBody Customer customer) {
+        Customer savedCustomer = customerService.addCustomer(customer);
+        return new ResponseEntity<>(savedCustomer, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/customers/{id}")
+    public Customer updateCustomer(@PathVariable Long id, @Valid @RequestBody Customer customer) {
+        return customerService.updateCustomer(id, customer);
+    }
+
+    @DeleteMapping("/customers/{id}")
+    public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
+        customerService.deleteCustomer(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+}
