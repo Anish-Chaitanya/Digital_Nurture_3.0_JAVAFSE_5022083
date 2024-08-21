@@ -1,0 +1,142 @@
+package com.example.bookstoreapi;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
+
+// Main application class
+@SpringBootApplication
+public class BookstoreApiApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(BookstoreApiApplication.class, args);
+    }
+}
+
+// Book entity
+class Book {
+    private Long id;
+    private String title;
+    private String author;
+    private String isbn;
+    private double price;
+
+    // Constructors
+    public Book() {}
+    
+    public Book(Long id, String title, String author, String isbn, double price) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.isbn = isbn;
+        this.price = price;
+    }
+
+    // Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+
+    public String getAuthor() { return author; }
+    public void setAuthor(String author) { this.author = author; }
+
+    public String getIsbn() { return isbn; }
+    public void setIsbn(String isbn) { this.isbn = isbn; }
+
+    public double getPrice() { return price; }
+    public void setPrice(double price) { this.price = price; }
+}
+
+// BookDTO
+class BookDTO {
+    private Long id;
+
+    @JsonProperty("book_title")
+    private String title;
+
+    @JsonProperty("book_author")
+    private String author;
+
+    @JsonIgnore
+    private String isbn;
+
+    private double price;
+
+    // Constructors
+    public BookDTO() {}
+
+    public BookDTO(Long id, String title, String author, double price) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+        this.price = price;
+    }
+
+    // Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+
+    public String getAuthor() { return author; }
+    public void setAuthor(String author) { this.author = author; }
+
+    public double getPrice() { return price; }
+    public void setPrice(double price) { this.price = price; }
+}
+
+// BookService to manage the book list
+@Service
+class BookService {
+    private final List<Book> books = new ArrayList<>();
+    private final AtomicLong counter = new AtomicLong();
+
+    public List<Book> getAllBooks() {
+        return books;
+    }
+
+    public Book addBook(Book book) {
+        book.setId(counter.incrementAndGet());
+        books.add(book);
+        return book;
+    }
+}
+
+// BookController with RESTful endpoints
+@RestController
+@RequestMapping("/books")
+class BookController {
+
+    private final BookService bookService;
+
+    public BookController(BookService bookService) {
+        this.bookService = bookService;
+    }
+
+    @GetMapping
+    public List<BookDTO> getAllBooks() {
+        List<BookDTO> bookDTOs = new ArrayList<>();
+        for (Book book : bookService.getAllBooks()) {
+            bookDTOs.add(new BookDTO(book.getId(), book.getTitle(), book.getAuthor(), book.getPrice()));
+        }
+        return bookDTOs;
+    }
+
+    @PostMapping
+    public ResponseEntity<BookDTO> addBook(@RequestBody BookDTO bookDTO) {
+        Book book = new Book(null, bookDTO.getTitle(), bookDTO.getAuthor(), null, bookDTO.getPrice());
+        Book savedBook = bookService.addBook(book);
+        BookDTO savedBookDTO = new BookDTO(savedBook.getId(), savedBook.getTitle(), savedBook.getAuthor(), savedBook.getPrice());
+        return new ResponseEntity<>(savedBookDTO, HttpStatus.CREATED);
+    }
+}
