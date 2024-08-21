@@ -1,0 +1,155 @@
+package com.example.bookstoreapi;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.context.request.WebRequest;
+
+import java.util.HashMap;
+import java.util.Map;
+
+@SpringBootApplication
+public class BookstoreApiApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(BookstoreApiApplication.class, args);
+    }
+}
+
+// Global Exception Handler
+@ControllerAdvice
+class GlobalExceptionHandler {
+
+    // Handle Resource Not Found Exception
+    @ExceptionHandler(ResourceNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<Map<String, Object>> handleResourceNotFoundException(
+            ResourceNotFoundException ex, WebRequest request) {
+        
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", System.currentTimeMillis());
+        body.put("status", HttpStatus.NOT_FOUND.value());
+        body.put("error", "Resource Not Found");
+        body.put("message", ex.getMessage());
+        body.put("path", request.getDescription(false).substring(4)); // Extracts the path from the request description
+
+        return new ResponseEntity<>(body, HttpStatus.NOT_FOUND);
+    }
+
+    // Handle Bad Request Exception
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<Map<String, Object>> handleBadRequestException(
+            IllegalArgumentException ex, WebRequest request) {
+        
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", System.currentTimeMillis());
+        body.put("status", HttpStatus.BAD_REQUEST.value());
+        body.put("error", "Bad Request");
+        body.put("message", ex.getMessage());
+        body.put("path", request.getDescription(false).substring(4));
+
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
+
+    // Handle Internal Server Error
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ResponseEntity<Map<String, Object>> handleGlobalException(
+            Exception ex, WebRequest request) {
+        
+        Map<String, Object> body = new HashMap<>();
+        body.put("timestamp", System.currentTimeMillis());
+        body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        body.put("error", "Internal Server Error");
+        body.put("message", ex.getMessage());
+        body.put("path", request.getDescription(false).substring(4));
+
+        return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}
+
+// Custom Exception for Resource Not Found
+@ResponseStatus(HttpStatus.NOT_FOUND)
+class ResourceNotFoundException extends RuntimeException {
+    public ResourceNotFoundException(String message) {
+        super(message);
+    }
+}
+
+// Example Book Controller for Testing
+@RestController
+@RequestMapping("/books")
+class BookController {
+
+    private final BookService bookService;
+
+    public BookController(BookService bookService) {
+        this.bookService = bookService;
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Book> getBookById(@PathVariable Long id) {
+        return bookService.getBookById(id)
+                .map(ResponseEntity::ok)
+                .orElseThrow(() -> new ResourceNotFoundException("Book with ID " + id + " not found"));
+    }
+}
+
+// Book Service Example
+@Service
+class BookService {
+
+    private final BookRepository bookRepository;
+
+    public BookService(BookRepository bookRepository) {
+        this.bookRepository = bookRepository;
+    }
+
+    public Optional<Book> getBookById(Long id) {
+        return bookRepository.findById(id);
+    }
+}
+
+// Book Repository Example
+@Repository
+interface BookRepository extends JpaRepository<Book, Long> {}
+
+// Book Entity Example
+@Entity
+class Book {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String title;
+    private String author;
+    private String isbn;
+    private double price;
+
+    // Constructors, Getters, and Setters
+    public Book() {}
+
+    public Book(String title, String author, String isbn, double price) {
+        this.title = title;
+        this.author = author;
+        this.isbn = isbn;
+        this.price = price;
+    }
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+
+    public String getAuthor() { return author; }
+    public void setAuthor(String author) { this.author = author; }
+
+    public String getIsbn() { return isbn; }
+    public void setIsbn(String isbn) { this.isbn = isbn; }
+
+    public double getPrice() { return price; }
+    public void setPrice(double price) { this.price = price; }
+}
