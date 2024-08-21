@@ -1,0 +1,175 @@
+package com.example.bookstoreapi;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.*;
+
+import javax.persistence.*;
+import java.util.List;
+import java.util.Optional;
+
+@SpringBootApplication
+public class BookstoreApiApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(BookstoreApiApplication.class, args);
+    }
+}
+
+// Book Entity
+@Entity
+class Book {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String title;
+    private String author;
+    private String isbn;
+    private double price;
+
+    // Constructors, Getters, and Setters
+    public Book() {}
+
+    public Book(String title, String author, String isbn, double price) {
+        this.title = title;
+        this.author = author;
+        this.isbn = isbn;
+        this.price = price;
+    }
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getTitle() { return title; }
+    public void setTitle(String title) { this.title = title; }
+
+    public String getAuthor() { return author; }
+    public void setAuthor(String author) { this.author = author; }
+
+    public String getIsbn() { return isbn; }
+    public void setIsbn(String isbn) { this.isbn = isbn; }
+
+    public double getPrice() { return price; }
+    public void setPrice(double price) { this.price = price; }
+}
+
+// Repository Interface for Book
+@Repository
+interface BookRepository extends JpaRepository<Book, Long> {}
+
+// Service Class for Book
+@Service
+class BookService {
+
+    private final BookRepository bookRepository;
+
+    public BookService(BookRepository bookRepository) {
+        this.bookRepository = bookRepository;
+    }
+
+    public List<Book> getAllBooks() {
+        return bookRepository.findAll();
+    }
+
+    public Optional<Book> getBookById(Long id) {
+        return bookRepository.findById(id);
+    }
+
+    public Book addBook(Book book) {
+        return bookRepository.save(book);
+    }
+
+    public Book updateBook(Long id, Book updatedBook) {
+        updatedBook.setId(id);
+        return bookRepository.save(updatedBook);
+    }
+
+    public void deleteBook(Long id) {
+        bookRepository.deleteById(id);
+    }
+}
+
+// Controller for Book
+@RestController
+@RequestMapping("/books")
+class BookController {
+
+    private final BookService bookService;
+
+    public BookController(BookService bookService) {
+        this.bookService = bookService;
+    }
+
+    // GET /books - Get all books
+    @GetMapping
+    public ResponseEntity<List<Book>> getAllBooks() {
+        List<Book> books = bookService.getAllBooks();
+        
+        // Custom headers
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Total-Count", String.valueOf(books.size()));
+        
+        return ResponseEntity.ok().headers(headers).body(books);
+    }
+
+    // GET /books/{id} - Get a book by ID
+    @GetMapping("/{id}")
+    public ResponseEntity<Book> getBookById(@PathVariable Long id) {
+        Optional<Book> book = bookService.getBookById(id);
+        return book.map(b -> {
+            // Custom headers
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("X-Book-Id", b.getId().toString());
+            return ResponseEntity.ok().headers(headers).body(b);
+        }).orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
+    // POST /books - Add a new book
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)  // Custom response status
+    public ResponseEntity<Book> addBook(@RequestBody Book book) {
+        Book savedBook = bookService.addBook(book);
+        
+        // Custom headers
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Location", "/books/" + savedBook.getId());
+        
+        return ResponseEntity.status(HttpStatus.CREATED).headers(headers).body(savedBook);
+    }
+
+    // PUT /books/{id} - Update an existing book
+    @PutMapping("/{id}")
+    public ResponseEntity<Book> updateBook(@PathVariable Long id, @RequestBody Book updatedBook) {
+        Optional<Book> existingBook = bookService.getBookById(id);
+        if (existingBook.isPresent()) {
+            Book savedBook = bookService.updateBook(id, updatedBook);
+            
+            // Custom headers
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("X-Updated-Book-Id", savedBook.getId().toString());
+            
+            return ResponseEntity.ok().headers(headers).body(savedBook);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    // DELETE /books/{id} - Delete a book by ID
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)  // Custom response status
+    public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
+        Optional<Book> book = bookService.getBookById(id);
+        if (book.isPresent()) {
+            bookService.deleteBook(id);
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+}
