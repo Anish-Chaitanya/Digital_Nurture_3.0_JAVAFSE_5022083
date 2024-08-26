@@ -1,0 +1,8 @@
+@Test
+void testGetBookNotFound() throws Exception {
+    when(bookController.getBook(99L)).thenThrow(new RuntimeException("Book not found"));
+
+    mockMvc.perform(MockMvcRequestBuilders.get("/books/99")
+            .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(MockMvcResultMatchers.status().isNotFound());
+}
