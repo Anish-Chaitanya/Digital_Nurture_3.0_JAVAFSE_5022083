@@ -1,0 +1,10 @@
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+{
+    "username": "user",
+    "password": "password"
+}
+
+
+GET http://localhost:8080/books/1
+Authorization: Bearer <JWT token>
