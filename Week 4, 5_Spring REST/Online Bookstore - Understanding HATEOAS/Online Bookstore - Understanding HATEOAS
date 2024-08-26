@@ -1,0 +1,74 @@
+// BookController.java
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class BookController {
+
+    @GetMapping("/books/{id}")
+    public EntityModel<Book> getBook(@PathVariable Long id) {
+        // Assume this method fetches the book by ID
+        Book book = findBookById(id);
+
+        // Create the resource with a self link
+        EntityModel<Book> resource = EntityModel.of(book);
+
+        // Add self link
+        Link selfLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(BookController.class).getBook(id)).withSelfRel();
+        resource.add(selfLink);
+
+        // Add a link to all books
+        Link allBooksLink = WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(BookController.class).getAllBooks()).withRel("all-books");
+        resource.add(allBooksLink);
+
+        return resource;
+    }
+
+    @GetMapping("/books")
+    public List<EntityModel<Book>> getAllBooks() {
+        // Assume this method fetches all books
+        List<Book> books = findAllBooks();
+
+        // Convert books to EntityModel with links
+        List<EntityModel<Book>> resources = books.stream()
+            .map(book -> EntityModel.of(book, 
+                WebMvcLinkBuilder.linkTo(WebMvcLinkBuilder.methodOn(BookController.class).getBook(book.getId())).withSelfRel()))
+            .collect(Collectors.toList());
+
+        return resources;
+    }
+
+    private Book findBookById(Long id) {
+        // Dummy implementation
+        return new Book(id, "Sample Title", "Sample Author");
+    }
+
+    private List<Book> findAllBooks() {
+        // Dummy implementation
+        return List.of(
+            new Book(1L, "Sample Title 1", "Sample Author 1"),
+            new Book(2L, "Sample Title 2", "Sample Author 2")
+        );
+    }
+}
+
+// Book.java
+public class Book {
+    private Long id;
+    private String title;
+    private String author;
+
+    // Constructors, getters, and setters
+
+    public Book(Long id, String title, String author) {
+        this.id = id;
+        this.title = title;
+        this.author = author;
+    }
+
+    // Getters and setters
+}
